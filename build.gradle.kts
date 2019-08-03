@@ -1,50 +1,28 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.liewjuntung.symbolicPlugin.SymbolicLink
+import com.liewjuntung.symbolicPlugin.SymbolicLinkExtension
+import com.liewjuntung.symbolicPlugin.createSymbolicLink
 
 plugins {
     kotlin("jvm") version "1.3.41"
-    `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.10.0"
+    id("com.liewjuntung.symbolicPlugin") version "1.0.1.3"
 }
 
-pluginBundle {
-    website = "<substitute your project website>"
-    vcsUrl = "<uri to project source repository>"
-    tags = listOf("symbolic link", "linux")
+tasks.register("createSymbolicLink", SymbolicLink::class){
+    actualFilePath = "test.txt"
+    symbolicDirPath = "build/test/"
+    rename = "testlink.txt"
 }
 
-gradlePlugin {
-    plugins {
-        create("symbolicPlugin") {
-            id = "com.liewjuntung.symbolicPlugin"
-            implementationClass = "com.liewjuntung.symbolic_plugin.SymbolicPlugin"
-            displayName = "Symbolic Link Plugin"
-            description = "A plugin to do symbolic link"
-        }
+tasks.register("createSymbolicLink2"){
+    doLast {
+        createSymbolicLink("test.txt", "build/test/", "link1.txt")
+        createSymbolicLink("test.txt", "build/test/", "link2.txt")
+        createSymbolicLink("test.txt", "build/test/", "link3.txt")
     }
 }
 
-
-group = "com.liewjuntung"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.register("copyFoo", Copy::class) {
-    from("$projectDir/foo.txt")
-    into("$projectDir/fooDir")
-
-}
-
-tasks.register("deleteFoo", Delete::class) {
-    delete = setOf("$projectDir/fooDir")
+configure<SymbolicLinkExtension> {
+    actualFileLocation = "test.txt"
+    symbolicFileDir = "build/test/symbolic/"
+    rename = "pluginLink.txt"
 }
